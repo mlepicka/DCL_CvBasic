@@ -73,7 +73,9 @@ protected:
 	bool onStop();
 
 	// Input data streams
-	Base::DataStreamIn<Types::HomogMatrix> in_homogMatrix;
+	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homogMatrix;
+	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homogMatrix_right;
+	Base::DataStreamIn<Base::UnitType> in_trigger;
 
 	// Output data streams
 	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
@@ -83,7 +85,7 @@ protected:
 	// Properties
 
 	// Handlers
-	void calculate();
+	Base::EventHandler<CalcStatistics> h_calculate;
 
 	Types::HomogMatrix cumulatedHomogMatrix;
 	cv::Mat_<double> cumulatedRvec;
@@ -97,6 +99,12 @@ protected:
 	double avgFi;
 	int counter;
 
+	double sumDeviationFi;
+	double sumDeviationAxisX;
+	double sumDeviationAxisY;
+	double sumDeviationAxisZ;
+
+	void calculate();
 
 };
 
