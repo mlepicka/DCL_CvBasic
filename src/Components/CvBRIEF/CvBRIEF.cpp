@@ -12,6 +12,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
+# include "opencv2/xfeatures2d.hpp"
 
 namespace Processors {
 namespace CvBRIEF {
@@ -66,15 +67,15 @@ void CvBRIEF::onNewImage()
 		cvtColor(img, gray, COLOR_BGR2GRAY);
 
 		//-- Step 1: Detect the keypoints using FAST Detector.
-		cv::FastFeatureDetector detector(10);
+		cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create(10);
 		std::vector<KeyPoint> keypoints;
-		detector.detect( gray, keypoints );
+		detector->detect( gray, keypoints );
 
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-		cv::BriefDescriptorExtractor extractor(32); //this is really 32 x 8 matches since they are binary matches packed into bytes
+		cv::Ptr<cv::xfeatures2d::BriefDescriptorExtractor> extractor= cv::xfeatures2d::BriefDescriptorExtractor::create(32); //this is really 32 x 8 matches since they are binary matches packed into bytes
 		Mat descriptors;
-		extractor.compute( gray, keypoints, descriptors);
+		extractor->compute( gray, keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

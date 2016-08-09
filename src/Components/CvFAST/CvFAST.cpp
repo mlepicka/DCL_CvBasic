@@ -63,9 +63,9 @@ void CvFAST::onNewImage()
 		cv::Mat input = in_img.read();
 
         //-- Step 1: Detect the keypoints using FAST Detector.
-        cv::FastFeatureDetector detector(m_threshold);
+        cv::Ptr<cv::FastFeatureDetector> detector= cv::FastFeatureDetector::create(m_threshold);
 		std::vector<KeyPoint> keypoints;
-		detector.detect( input, keypoints );
+		detector->detect( input, keypoints );
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

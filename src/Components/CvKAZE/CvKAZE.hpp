@@ -1,12 +1,11 @@
 /*!
  * \file
  * \brief 
- * \author Jan Figat,
- * \e-mail jan.figat@gmail.com
+ * \author Tomek Kornuta,,,
  */
 
-#ifndef CvSTARDETECTOR_HPP_
-#define CvSTARDETECTOR_HPP_
+#ifndef CVKAZE_HPP_
+#define CVKAZE_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -16,34 +15,36 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <opencv2/xfeatures2d.hpp>
+#if (CV_MAJOR_VERSION == 2)
+#if (CV_MINOR_VERSION > 3)
+#include <opencv2/nonfree/features2d.hpp>
+#endif
+#endif
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 
 
 namespace Processors {
-namespace CvStarDetector {
+namespace CvKAZE {
 
 using namespace cv;
 
 /*!
- * \class CvStarDetector
- * \brief CvStarDetector processor class.
+ * \class CvKAZE
+ * \brief CvKAZE processor class.
  *
- * CvStarDetector processor.
+ * CvKAZE processor.
  */
-class CvStarDetector: public Base::Component {
+class CvKAZE: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-    CvStarDetector(const std::string & name = "CvStarDetector");
+	CvKAZE(const std::string & name = "CvKAZE");
 
 	/*!
 	 * Destructor
 	 */
-    virtual ~CvStarDetector();
+	virtual ~CvKAZE();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -80,7 +81,7 @@ protected:
 	void onNewImage();
 
 	/// Input data stream
-	Base::DataStreamIn <cv::Mat> in_img;
+	Base::DataStreamIn <Mat> in_img;
 
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;
@@ -88,17 +89,14 @@ protected:
 	/// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
-	// The maximum number of features to retain
-	Base::Property<int> nfeatures;
-
 };
 
-} //: namespace CvStarDetector
+} //: namespace CvKAZE
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvStarDetector", Processors::CvStarDetector::CvStarDetector)
+REGISTER_COMPONENT("CvKAZE", Processors::CvKAZE::CvKAZE)
 
-#endif /* CvSTARDETECTOR_HPP_ */
+#endif /* CVSIFT_HPP_ */

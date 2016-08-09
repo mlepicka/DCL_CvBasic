@@ -11,6 +11,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
+# include "opencv2/xfeatures2d/nonfree.hpp"
 
 namespace Processors {
 namespace CvSURF {
@@ -63,15 +64,16 @@ void CvSURF::onNewImage()
 
 
 		//-- Step 1: Detect the keypoints using SURF Detector.
-		SurfFeatureDetector detector( minHessian );
+		cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> detector = cv::xfeatures2d::SurfFeatureDetector::create(minHessian);
+	
+		
 		std::vector<KeyPoint> keypoints;
-		detector.detect( input, keypoints );
-
+		detector->detect( input, keypoints );
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-        SurfDescriptorExtractor extractor;
+        cv::Ptr<cv::xfeatures2d::SurfDescriptorExtractor> extractor;
 		Mat descriptors;
-		extractor.compute( input, keypoints, descriptors);
+		extractor->compute( input, keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

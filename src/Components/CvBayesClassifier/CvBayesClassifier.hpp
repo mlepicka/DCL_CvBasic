@@ -20,6 +20,7 @@
 
 using namespace cv;
 
+
 namespace Processors {
 namespace CvBayesClassifier {
 
@@ -145,7 +146,7 @@ protected:
 
 private:
 	// Classifier.true
-	CvNormalBayesClassifier bayes;
+	Ptr<ml::NormalBayesClassifier> bayes = ml::NormalBayesClassifier::create();
 
 	// The vector of vectors of moments used for training
 	vector<Moments> training_dataset;

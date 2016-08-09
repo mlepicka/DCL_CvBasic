@@ -12,13 +12,11 @@
 
 #include <boost/bind.hpp>
 
-#if CV_MAJOR_VERSION == 2
-#if CV_MINOR_VERSION > 3
-#include <opencv2/nonfree/features2d.hpp>
-#endif
-#elif CV_MAJOR_VERSION == 3
-#include <opencv2/nonfree/features2d.hpp>
-#endif
+#include "opencv2/opencv_modules.hpp"
+#include <stdio.h>
+#include "opencv2/core/core.hpp"
+
+#include "opencv2/xfeatures2d.hpp"
 
 namespace Processors {
 namespace CvSIFT {
@@ -61,24 +59,40 @@ bool CvSIFT::onStart() {
 
 void CvSIFT::onNewImage()
 {
-	LOG(LTRACE) << "CvSIFT::onNewImage\n";
+	LOG(LTRACE) << "CvSIFT::onNewImage";
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 
+		std::vector<cv::KeyPoint> keypoints;
+		cv::Mat descriptors = cv::Mat();
 
+		cv::Ptr<cv::Feature2D> sift = cv::xfeatures2d::SIFT::create();
+		sift->detectAndCompute(input, cv::noArray(), keypoints, descriptors);
+
+
+/*
 		//-- Step 1: Detect the keypoints.
-	    cv::SiftFeatureDetector detector;
+	    cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> detector = cv::xfeatures2d::SiftFeatureDetector::create();
 	    std::vector<cv::KeyPoint> keypoints;
-	    detector.detect(input, keypoints);
+	    detector->detect(input, keypoints);
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-		cv::SiftDescriptorExtractor extractor;
-		Mat descriptors;
-		extractor.compute( input, keypoints, descriptors);
-
+		cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> extractor = cv::xfeatures2d::SiftDescriptorExtractor::create();
+		cv::Mat descriptors=cv::Mat();
+		extractor->compute(input, keypoints, descriptors);
+*/
 		// Write results to outputs.
+
 	    Types::Features features(keypoints);
+	    
+	    LOG(LINFO) << "CvSIFT::FEATURES SIZE "<< features.features.size();
+	    LOG(LINFO) << "CvSIFT::DESC SIZE "<< descriptors.total();
+	    
+	    sift.release();
+	    
+	    LOG(LINFO) << "CvSIFT::Released ";
+
 		out_features.write(features);
 		out_descriptors.write(descriptors);
 	} catch (...) {

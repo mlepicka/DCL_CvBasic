@@ -121,26 +121,28 @@ void CvFindCirclesGrid_Processor::onNewImage()
 		if(in_img.empty()){
 			return;
 		}
+		CLOG(LTRACE) << "void CvFindCirclesGrid_Processor::onNewImage() begin\n";
 		// Retrieve image from the stream.
 		Mat image = in_img.read().clone();
 
+		CLOG(LTRACE) << "void CvFindCirclesGrid_Processor::onNewImage() begin\n";
 		if(prop_inverse){
 			image =  cv::Scalar::all(255) - image;
 		}
 
 		bool found;
-
+		CLOG(LTRACE) << "void CvFindCirclesGrid_Processor::onNewImage() begin\n";
 		// Initialize grid size.
 		cv::Size gridSize(prop_width, prop_height);
 
 		found = findCirclesGrid(image, gridSize, gridPoints, CALIB_CB_ASYMMETRIC_GRID|CALIB_CB_CLUSTERING);
-
+		CLOG(LTRACE) << "void CvFindCirclesGrid_Processor::onNewImage() 444begin\n";
 		// check if found, if not-invert colors and try again
 		if(found){
 			//LOG(LWARNING)<<"Dots found!!!\n\n\n";
 			gridPattern->setImagePoints(gridPoints);
 			out_gridPattern.write(*gridPattern);
-
+CLOG(LTRACE) << "void CvFindCirclesGrid_Processor::onNewImage() begin\n";
 		} else {
 			CLOG(LWARNING) << "Pattern not found\n";
 			// TODO: add unit type: not found

@@ -65,8 +65,10 @@ void CvMSER::onNewImage()
 		cvtColor(img,yuv, COLOR_BGR2YCrCb);
 		cvtColor(img, gray, COLOR_BGR2GRAY);
 		vector<vector<Point> > regions;
-		cv::MSER ms;
-		ms(img, regions, cv::Mat());
+		cv::Ptr<cv::MSER> ms=cv::MSER::create();
+		std::vector< Rect >  boxes;
+		ms->detectRegions(img, regions, boxes);
+		
 		for (int i = 0; i < regions.size(); i++)
 		    {
 		        ellipse(img, fitEllipse(regions[i]), Scalar(255));

@@ -220,9 +220,11 @@ void CvBayesClassifier::onNewData() {
 			}
 
 			cv::Mat prediction = cv::Mat::zeros(1, m.size(), CV_32FC1);
+			cv::OutputArray op = OutputArray(prediction)
 			CLOG(LNOTICE) << "Test matrix:\n" << test_mat;
 			// Predict!
-			bayes.predict(test_mat, &prediction);
+			bayes->predict(cv::InputArray(test_mat), op);
+			prediction = op.getMat();
 			CLOG(LNOTICE) << "Recognized classes: " << prediction;
 		}
 
@@ -295,7 +297,7 @@ void CvBayesClassifier::onClearDataset() {
 
 void CvBayesClassifier::onBayesClear() {
 	CLOG(LTRACE) << "CvBayesClassifier::onBayesClear\n";
-	bayes.clear();
+	bayes->clear();
 	CLOG(LINFO) << "Bayes classifer cleared";
 }
 
@@ -313,7 +315,7 @@ void CvBayesClassifier::onBayesTraining() {
 		CLOG(LINFO) << "Training response:\n" << resp_mat;
 
 		// Train is coming! ;)
-		bayes.train(train_mat, resp_mat);
+		bayes->train(cv::InputArray(train_mat), 0, cv::InputArray(resp_mat));
 
 		// Clear dataset.
 		//		onClearDataset();
@@ -350,7 +352,7 @@ void CvBayesClassifier::onBayesSave() {
 		CLOG(LTRACE) << "CvBayesClassifier::onSaveBayes\n";
 		std::string tmp = std::string("./") + std::string(filename);
 		 /* CLOG(LNOTICE) << " file: "<<std::string(tmp).c_str();*/
-		bayes.save(std::string(tmp).c_str());
+		bayes->save(std::string(tmp).c_str());
 		//bayes.save("test.yml");
 		CLOG(LNOTICE) << "Bayes saved to xml file: " << filename;
 	} catch (...) {
@@ -361,7 +363,7 @@ void CvBayesClassifier::onBayesSave() {
 void CvBayesClassifier::onBayesLoad() {
 	try {
 		CLOG(LTRACE) << "CvBayesClassifier::onLoadBayes\n";
-		bayes.load(std::string(filename).c_str());
+		bayes->load((cv::String(std::string(filename).c_str())));
 		//	bayes.load("test.yml");
 		CLOG(LNOTICE) << "Bayes loaded from the xml file: " << filename;
 	} catch (...) {

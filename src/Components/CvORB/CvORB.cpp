@@ -12,7 +12,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
-
+# include "opencv2/xfeatures2d/nonfree.hpp"
 namespace Processors {
 namespace CvORB {
 
@@ -65,10 +65,10 @@ void CvORB::onNewImage()
 			cvtColor(input, input, COLOR_BGR2GRAY);
 
 		//-- Step 1: Detect the keypoints using ORB Detector.
-		cv::ORB orb( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
+		cv::Ptr<cv::ORB> orb = cv::ORB::create( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
 		std::vector<KeyPoint> keypoints;
-		Mat descriptors;
-		orb(input, cv::Mat(), keypoints, descriptors);
+		cv::Mat descriptors;
+		orb->detectAndCompute(input, cv::Mat(), keypoints, descriptors);
 
 		// Write features to the output.
 		Types::Features features(keypoints);

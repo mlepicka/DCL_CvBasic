@@ -11,7 +11,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-
+#include "opencv2/opencv.hpp"
 namespace Sources {
 namespace Movie {
 
@@ -50,7 +50,7 @@ bool Movie_Source::onInit() {
 		return false;
 	}
 
-	cap.open(filename);
+	cap.open(cv::String(filename));
 
 	if (!cap.isOpened()) {
 		LOG(LERROR) << "Couldn't open movie " << filename;

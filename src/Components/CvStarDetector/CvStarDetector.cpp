@@ -65,15 +65,15 @@ void CvStarDetector::onNewImage()
 		cvtColor(input, gray, COLOR_BGR2GRAY);
 
         //-- Step 1: Detect the keypoints using StarDetector Detector.
-        cv::StarDetector /*StarFeatureDetector*/ detector( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
+        cv::Ptr<cv::xfeatures2d::StarDetector> /*StarFeatureDetector*/ detector = cv::xfeatures2d::StarDetector::create( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
 		std::vector<KeyPoint> keypoints;
-		detector.detect( gray, keypoints );
+		detector->detect( gray, keypoints );
 
 
 		//-- Step 2: Calculate descriptors (feature vectors) - SURF descriptor.
-        cv::SurfDescriptorExtractor extractor;
+        cv::Ptr<cv::xfeatures2d::SurfDescriptorExtractor> extractor;
 		cv::Mat descriptors;
-		extractor.compute( gray, keypoints, descriptors);
+		extractor->compute( gray, keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

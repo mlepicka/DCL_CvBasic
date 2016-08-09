@@ -10,7 +10,8 @@
 
 #include "Drawable.hpp"
 #include <cmath>
-
+#include <opencv2/imgproc.hpp>
+    #include <opencv2/highgui.hpp>
 namespace Types {
 
 class Line: public Types::Drawable

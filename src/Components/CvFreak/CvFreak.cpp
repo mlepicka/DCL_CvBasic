@@ -12,7 +12,8 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
-
+# include "opencv2/xfeatures2d/nonfree.hpp"
+# include "opencv2/xfeatures2d.hpp"
 
 namespace Processors {
 namespace CvFreak {
@@ -67,15 +68,15 @@ void CvFreak::onNewImage()
         //-- Step 1: Detect the keypoints using FAST Detector.
         std::vector<KeyPoint> keypoints;
         //cv::FAST(gray,keypoints,10);
-        cv::FastFeatureDetector detector(10);
-        detector.detect( gray, keypoints );
+        cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create(10);
+        detector->detect( gray, keypoints );
 
 
 
 		//-- Step 2: Calculate descriptors (feature vectors) using Freak descriptor.
-        cv::FREAK extractor;
+        cv::Ptr<cv::xfeatures2d::FREAK> extractor;
         cv::Mat descriptors;
-        extractor.compute( gray, keypoints, descriptors);
+        extractor->compute( gray, keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

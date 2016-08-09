@@ -52,7 +52,7 @@ void CvVideoWriter_Sink::prepareInterface() {
 bool CvVideoWriter_Sink::onInit() {
 	LOG(LTRACE) << "CvVideoWriter_Sink::initialize\n";
 
-	writer.open(filename, fourcc, fps, cv::Size(width, height));
+	writer.open(cv::String(filename), fourcc, fps, cv::Size(width, height));
 
 	if (writer.isOpened())
 		LOG(LTRACE) << "CameraOpenCV: device opened\n";
