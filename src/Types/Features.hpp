@@ -22,10 +22,12 @@ public:
 
 	Features(const Types::Features & _features) {
 		features.insert(features.end(), _features.features.begin(), _features.features.end());
+		this->type = _features.type;
 	};
 
-	Features(const std::vector<cv::KeyPoint> & _features) {
+	Features(const std::vector<cv::KeyPoint> & _features, std::string type="") {
 		features.insert(features.end(), _features.begin(), _features.end());
+		this->type = type;
 	};
 
 	virtual ~Features() {}
@@ -38,6 +40,7 @@ public:
 		return new Features(*this);
 	}
 
+	std::string type;
 //private:
 	std::vector<cv::KeyPoint> features;
 };

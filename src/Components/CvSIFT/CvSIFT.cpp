@@ -79,6 +79,7 @@ void CvSIFT::onNewImage()
 
 		// Write results to outputs.
 	    Types::Features features(keypoints);
+	    features.type = "SIFT";
 		out_features.write(features);
 		out_descriptors.write(descriptors);
 	} catch (...) {

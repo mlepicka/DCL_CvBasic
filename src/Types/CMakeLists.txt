@@ -1,4 +1,4 @@
-FILE(GLOB headers *.hpp)
+FILE(GLOB headers *.hpp *.cpp)
 
 install(
     FILES ${headers}
