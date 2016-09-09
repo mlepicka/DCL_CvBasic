@@ -6,19 +6,16 @@
  * @author Pablo F. Alcantarilla, Jesus Nuevo
  */
 
-#include "../precomp.hpp"
 #include "AKAZEFeatures.h"
-#include "fed.h"
-#include "nldiffusion_functions.h"
 #include "utils.h"
-
+//#include <opencv2/core/hal/hal.hpp>
 #include <iostream>
-
+#define  CV_TOGGLE_FLT(x) ((x)^((int)(x) < 0 ? 0x7fffffff : 0))
 // Namespaces
 namespace cv
 {
 using namespace std;
-
+using namespace cv;
 /* ************************************************************************* */
 /**
  * @brief AKAZEFeatures constructor with input options
@@ -30,7 +27,7 @@ AKAZEFeatures::AKAZEFeatures(const AKAZEOptions& options) : options_(options) {
   ncycles_ = 0;
   reordering_ = true;
 
-  if (options_.descriptor_size > 0 && options_.descriptor >= AKAZE::DESCRIPTOR_MLDB_UPRIGHT) {
+  if (options_.descriptor_size > 0 && options_.descriptor >= 4){ //AKAZE::DESCRIPTOR_MLDB_UPRIGHT) {
     generateDescriptorSubsample(descriptorSamples_, descriptorBits_, options_.descriptor_size,
                                 options_.descriptor_pattern_size, options_.descriptor_channels);
   }
@@ -265,10 +262,10 @@ void AKAZEFeatures::Find_Scale_Space_Extrema(std::vector<KeyPoint>& kpts)
   vector<KeyPoint> kpts_aux;
 
   // Set maximum size
-  if (options_.descriptor == AKAZE::DESCRIPTOR_MLDB_UPRIGHT || options_.descriptor == AKAZE::DESCRIPTOR_MLDB) {
+  if (options_.descriptor == 4/*AKAZE::DESCRIPTOR_MLDB_UPRIGHT*/ || options_.descriptor == 5/*AKAZE::DESCRIPTOR_MLDB*/) {
     smax = 10.0f*sqrtf(2.0f);
   }
-  else if (options_.descriptor == AKAZE::DESCRIPTOR_KAZE_UPRIGHT || options_.descriptor == AKAZE::DESCRIPTOR_KAZE) {
+  else if (options_.descriptor == 2/*AKAZE::DESCRIPTOR_KAZE_UPRIGHT*/ || options_.descriptor == 3/*AKAZE::DESCRIPTOR_KAZE*/) {
     smax = 12.0f*sqrtf(2.0f);
   }
 
@@ -713,7 +710,7 @@ void AKAZEFeatures::Compute_Descriptors(std::vector<KeyPoint>& kpts, Mat& desc)
   }
 
   // Allocate memory for the matrix with the descriptors
-  if (options_.descriptor < AKAZE::DESCRIPTOR_MLDB_UPRIGHT) {
+  if (options_.descriptor < 4/*AKAZE::DESCRIPTOR_MLDB_UPRIGHT*/) {
     desc = Mat::zeros((int)kpts.size(), 64, CV_32FC1);
   }
   else {
@@ -730,17 +727,17 @@ void AKAZEFeatures::Compute_Descriptors(std::vector<KeyPoint>& kpts, Mat& desc)
 
   switch (options_.descriptor)
   {
-    case AKAZE::DESCRIPTOR_KAZE_UPRIGHT: // Upright descriptors, not invariant to rotation
+    case 2: //AKAZE::DESCRIPTOR_KAZE_UPRIGHT: // Upright descriptors, not invariant to rotation
     {
       parallel_for_(Range(0, (int)kpts.size()), MSURF_Upright_Descriptor_64_Invoker(kpts, desc, evolution_));
     }
     break;
-    case AKAZE::DESCRIPTOR_KAZE:
+    case 3: //AKAZE::DESCRIPTOR_KAZE:
     {
       parallel_for_(Range(0, (int)kpts.size()), MSURF_Descriptor_64_Invoker(kpts, desc, evolution_));
     }
     break;
-    case AKAZE::DESCRIPTOR_MLDB_UPRIGHT: // Upright descriptors, not invariant to rotation
+    case 4://AKAZE::DESCRIPTOR_MLDB_UPRIGHT: // Upright descriptors, not invariant to rotation
     {
       if (options_.descriptor_size == 0)
         parallel_for_(Range(0, (int)kpts.size()), Upright_MLDB_Full_Descriptor_Invoker(kpts, desc, evolution_, options_));
@@ -748,7 +745,7 @@ void AKAZEFeatures::Compute_Descriptors(std::vector<KeyPoint>& kpts, Mat& desc)
         parallel_for_(Range(0, (int)kpts.size()), Upright_MLDB_Descriptor_Subset_Invoker(kpts, desc, evolution_, options_, descriptorSamples_, descriptorBits_));
     }
     break;
-    case AKAZE::DESCRIPTOR_MLDB:
+    case 5://AKAZE::DESCRIPTOR_MLDB:
     {
       if (options_.descriptor_size == 0)
         parallel_for_(Range(0, (int)kpts.size()), MLDB_Full_Descriptor_Invoker(kpts, desc, evolution_, options_));
@@ -812,7 +809,7 @@ void AKAZEFeatures::Compute_Main_Orientation(KeyPoint& kpt, const std::vector<TE
       }
     }
   }
-  hal::fastAtan2(resY, resX, Ang, ang_size, false);
+  fastAtan2(resY, resX, Ang, ang_size, false);
   // Loop slides pi/3 window around feature point
   for (ang1 = 0; ang1 < (float)(2.0 * CV_PI); ang1 += 0.15f) {
     ang2 = (ang1 + (float)(CV_PI / 3.0) >(float)(2.0*CV_PI) ? ang1 - (float)(5.0*CV_PI / 3.0) : ang1 + (float)(CV_PI / 3.0));
@@ -842,6 +839,109 @@ void AKAZEFeatures::Compute_Main_Orientation(KeyPoint& kpt, const std::vector<TE
       kpt.angle = getAngle(sumX, sumY) * 180.f / static_cast<float>(CV_PI);
     }
   }
+}
+
+///////////////////////////////////// ATAN2 ////////////////////////////////////
+static const float atan2_p1 = 0.9997878412794807f*(float)(180/CV_PI);
+static const float atan2_p3 = -0.3258083974640975f*(float)(180/CV_PI);
+static const float atan2_p5 = 0.1555786518463281f*(float)(180/CV_PI);
+static const float atan2_p7 = -0.04432655554792128f*(float)(180/CV_PI);
+
+void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+{
+    int i = 0;
+    float scale = angleInDegrees ? 1 : (float)(CV_PI/180);
+
+#ifdef HAVE_TEGRA_OPTIMIZATION
+    if (tegra::useTegra() && tegra::FastAtan2_32f(Y, X, angle, len, scale))
+        return;
+#endif
+
+#if CV_SSE2
+    Cv32suf iabsmask; iabsmask.i = 0x7fffffff;
+    __m128 eps = _mm_set1_ps((float)DBL_EPSILON), absmask = _mm_set1_ps(iabsmask.f);
+    __m128 _90 = _mm_set1_ps(90.f), _180 = _mm_set1_ps(180.f), _360 = _mm_set1_ps(360.f);
+    __m128 z = _mm_setzero_ps(), scale4 = _mm_set1_ps(scale);
+    __m128 p1 = _mm_set1_ps(atan2_p1), p3 = _mm_set1_ps(atan2_p3);
+    __m128 p5 = _mm_set1_ps(atan2_p5), p7 = _mm_set1_ps(atan2_p7);
+
+    for( ; i <= len - 4; i += 4 )
+    {
+        __m128 x = _mm_loadu_ps(X + i), y = _mm_loadu_ps(Y + i);
+        __m128 ax = _mm_and_ps(x, absmask), ay = _mm_and_ps(y, absmask);
+        __m128 mask = _mm_cmplt_ps(ax, ay);
+        __m128 tmin = _mm_min_ps(ax, ay), tmax = _mm_max_ps(ax, ay);
+        __m128 c = _mm_div_ps(tmin, _mm_add_ps(tmax, eps));
+        __m128 c2 = _mm_mul_ps(c, c);
+        __m128 a = _mm_mul_ps(c2, p7);
+        a = _mm_mul_ps(_mm_add_ps(a, p5), c2);
+        a = _mm_mul_ps(_mm_add_ps(a, p3), c2);
+        a = _mm_mul_ps(_mm_add_ps(a, p1), c);
+
+        __m128 b = _mm_sub_ps(_90, a);
+        a = _mm_xor_ps(a, _mm_and_ps(_mm_xor_ps(a, b), mask));
+
+        b = _mm_sub_ps(_180, a);
+        mask = _mm_cmplt_ps(x, z);
+        a = _mm_xor_ps(a, _mm_and_ps(_mm_xor_ps(a, b), mask));
+
+        b = _mm_sub_ps(_360, a);
+        mask = _mm_cmplt_ps(y, z);
+        a = _mm_xor_ps(a, _mm_and_ps(_mm_xor_ps(a, b), mask));
+
+        a = _mm_mul_ps(a, scale4);
+        _mm_storeu_ps(angle + i, a);
+    }
+#elif CV_NEON
+    float32x4_t eps = vdupq_n_f32((float)DBL_EPSILON);
+    float32x4_t _90 = vdupq_n_f32(90.f), _180 = vdupq_n_f32(180.f), _360 = vdupq_n_f32(360.f);
+    float32x4_t z = vdupq_n_f32(0.0f), scale4 = vdupq_n_f32(scale);
+    float32x4_t p1 = vdupq_n_f32(atan2_p1), p3 = vdupq_n_f32(atan2_p3);
+    float32x4_t p5 = vdupq_n_f32(atan2_p5), p7 = vdupq_n_f32(atan2_p7);
+
+    for( ; i <= len - 4; i += 4 )
+    {
+        float32x4_t x = vld1q_f32(X + i), y = vld1q_f32(Y + i);
+        float32x4_t ax = vabsq_f32(x), ay = vabsq_f32(y);
+        float32x4_t tmin = vminq_f32(ax, ay), tmax = vmaxq_f32(ax, ay);
+        float32x4_t c = vmulq_f32(tmin, cv_vrecpq_f32(vaddq_f32(tmax, eps)));
+        float32x4_t c2 = vmulq_f32(c, c);
+        float32x4_t a = vmulq_f32(c2, p7);
+        a = vmulq_f32(vaddq_f32(a, p5), c2);
+        a = vmulq_f32(vaddq_f32(a, p3), c2);
+        a = vmulq_f32(vaddq_f32(a, p1), c);
+
+        a = vbslq_f32(vcgeq_f32(ax, ay), a, vsubq_f32(_90, a));
+        a = vbslq_f32(vcltq_f32(x, z), vsubq_f32(_180, a), a);
+        a = vbslq_f32(vcltq_f32(y, z), vsubq_f32(_360, a), a);
+
+        vst1q_f32(angle + i, vmulq_f32(a, scale4));
+    }
+#endif
+
+    for( ; i < len; i++ )
+    {
+        float x = X[i], y = Y[i];
+        float ax = std::abs(x), ay = std::abs(y);
+        float a, c, c2;
+        if( ax >= ay )
+        {
+            c = ay/(ax + (float)DBL_EPSILON);
+            c2 = c*c;
+            a = (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
+        }
+        else
+        {
+            c = ax/(ay + (float)DBL_EPSILON);
+            c2 = c*c;
+            a = 90.f - (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
+        }
+        if( x < 0 )
+            a = 180.f - a;
+        if( y < 0 )
+            a = 360.f - a;
+        angle[i] = (float)(a*scale);
+    }
 }
 
 /* ************************************************************************* */

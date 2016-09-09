@@ -3,18 +3,21 @@
 
 #include "CvKAZE.hpp"
 #include "Common/Logger.hpp"
-
+#include "Common/Timer.hpp"
+#include <sstream>
+#include <fstream>
 #include <boost/bind.hpp>
 
 #include <opencv2/features2d.hpp>
 #include "Types/KAZE.hpp"
+#include "Types/AKAZE.hpp"
 
 namespace Processors {
 namespace CvKAZE {
 
 CvKAZE::CvKAZE(const std::string & name) :
-		Base::Component(name)  {
-
+		Base::Component(name), prop_calc_path("Calculations_path",std::string(".")) {
+	registerProperty(prop_calc_path);
 }
 
 CvKAZE::~CvKAZE() {
@@ -58,11 +61,18 @@ void CvKAZE::onNewImage()
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 
+		std::ofstream feature_calc_time;
+		feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech.txt")).c_str(), ios::out|ios::app);
+
 		std::vector<cv::KeyPoint> keypoints;
 		Mat descriptors;
+		Common::Timer timer;
 
-		Ptr<KAZE> kaze = KAZE::create(true);
+		timer.restart();
+		Ptr<AKAZE> kaze = AKAZE::create(); //create(false);
 		kaze->detectAndCompute(input, cv::noArray(), keypoints, descriptors);
+
+		feature_calc_time << timer.elapsed() << endl;
 
 		// Write results to outputs.
 	    Types::Features features(keypoints, "KAZE");

@@ -31,12 +31,12 @@ CalcObjectLocation::~CalcObjectLocation() {
 
 void CalcObjectLocation::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-	registerStream("in_homogMatrix", &in_homogMatrix);
-	registerStream("out_homogMatrix", &out_homogMatrix);
+	registerStream("in_homog_matrix", &in_homog_matrix);
+	registerStream("out_homog_matrix", &out_homog_matrix);
 
 	// Register handlers
 	registerHandler("calculate", boost::bind(&CalcObjectLocation::calculate,this));
-	addDependency("calculate", &in_homogMatrix);
+	addDependency("calculate", &in_homog_matrix);
 }
 
 bool CalcObjectLocation::onInit() {
@@ -68,9 +68,9 @@ void CalcObjectLocation::calculate() {
 	rotMatrix = cv::Mat_<double>::zeros(3,3);
 	tvectemp = cv::Mat_<double>::zeros(3,1);
 
-	while (!in_homogMatrix.empty()) {
+	while (!in_homog_matrix.empty()) {
 		cv::Mat_<double> rvectemp;
-		homogMatrix=in_homogMatrix.read();
+		homogMatrix=in_homog_matrix.read();
 
 		if (homogMatrix.isIdentity()) {
 			continue;
@@ -90,7 +90,7 @@ void CalcObjectLocation::calculate() {
 	}
 
 	if (rvec.size() == 1) {
-		out_homogMatrix.write(homogMatrix);
+		out_homog_matrix.write(homogMatrix);
 		return;
 	}
 
@@ -146,7 +146,7 @@ void CalcObjectLocation::calculate() {
 		}
         hm(i, 3) = tvec_avg(i, 0);
 	}
-	out_homogMatrix.write(hm);
+	out_homog_matrix.write(hm);
 }
 
 } //: namespace CalcObjectLocation

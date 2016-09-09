@@ -83,6 +83,9 @@ protected:
 	/// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
+	///  Property - path to save calculation results
+	Base::Property<std::string> prop_calc_path;
+
 };
 
 } //: namespace CvKAZE

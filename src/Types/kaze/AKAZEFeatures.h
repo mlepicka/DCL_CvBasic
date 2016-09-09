@@ -12,7 +12,12 @@
 /* ************************************************************************* */
 // Includes
 #include "AKAZEConfig.h"
+#include "nldiffusion_functions.h"
+#include "nldiffusion_functions.cpp"
+#include "fed.h"
+#include "fed.cpp"
 #include "TEvolution.h"
+#include "../AKAZE.hpp"
 
 namespace cv
 {

@@ -125,7 +125,7 @@ private:
 
 	Base::DataStreamInPtr <Types::Objects3D::Object3D> in_object3d;
 	Base::DataStreamIn <Types::CameraInfo> in_camerainfo;
-	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
+	Base::DataStreamOut <Types::HomogMatrix> out_homog_matrix;
 	Base::DataStreamOut <cv::Mat> out_rvec;
 	Base::DataStreamOut <cv::Mat> out_tvec;
 

@@ -30,7 +30,8 @@
 */
 //#include "../precomp.hpp"
 #include "fed.h"
-
+#ifndef __OPENCV_FEATURES_2D_FED_CPP__
+#define __OPENCV_FEATURES_2D_FED_CPP__
 using namespace std;
 
 //*************************************************************************************
@@ -190,3 +191,4 @@ bool fed_is_prime_internal(const int& number) {
     return is_prime;
   }
 }
+#endif

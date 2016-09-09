@@ -8,6 +8,9 @@
 #ifndef __OPENCV_FEATURES_2D_AKAZE_CONFIG_H__
 #define __OPENCV_FEATURES_2D_AKAZE_CONFIG_H__
 
+#include <opencv2/features2d.hpp>
+#include "../AKAZE.hpp"
+
 namespace cv
 {
 /* ************************************************************************* */
@@ -27,7 +30,7 @@ struct AKAZEOptions {
         , dthreshold(0.001f)
         , min_dthreshold(0.00001f)
 
-        , descriptor(AKAZE::DESCRIPTOR_MLDB)
+        , descriptor(5)
         , descriptor_size(0)
         , descriptor_channels(3)
         , descriptor_pattern_size(10)

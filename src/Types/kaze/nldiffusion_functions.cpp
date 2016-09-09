@@ -26,6 +26,9 @@
 #include "nldiffusion_functions.h"
 #include <iostream>
 
+#ifndef __OPENCV_FEATURES_2D_NLDIFFUSION_FUNCTIONS_CPP__
+#define __OPENCV_FEATURES_2D_NLDIFFUSION_FUNCTIONS_CPP__
+
 // Namespaces
 
 /* ************************************************************************* */
@@ -519,3 +522,4 @@ bool check_maximum_neighbourhood(const cv::Mat& img, int dsize, float value, int
 }
 
 }
+#endif

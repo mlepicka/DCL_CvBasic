@@ -54,7 +54,7 @@ void CvSolvePnP_Processor::prepareInterface() {
 
 	registerStream("in_object3d", &in_object3d);
 	registerStream("in_camera_info", &in_camerainfo);
-	registerStream("out_homogMatrix", &out_homogMatrix);
+	registerStream("out_homog_matrix", &out_homog_matrix);
 	registerStream("out_rvec", &out_rvec);
 	registerStream("out_tvec", &out_tvec);
 }
@@ -208,7 +208,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 	TODO: fix
 	out_rvec.write(rvec.clone());
 	out_tvec.write(tvec.clone());*/
-	out_homogMatrix.write(hm);
+	out_homog_matrix.write(hm);
 }
 
 } // namespace CvSolvePnP

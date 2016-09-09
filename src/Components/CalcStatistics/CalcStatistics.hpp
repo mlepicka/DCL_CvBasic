@@ -73,36 +73,38 @@ protected:
 	bool onStop();
 
 	// Input data streams
-	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homogMatrix;
-	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homogMatrix_right;
+	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homog_matrix;
+	Base::DataStreamIn<Types::HomogMatrix,Base::DataStreamBuffer::Newest> in_homog_matrix_right;
 	Base::DataStreamIn<Base::UnitType> in_trigger;
 
 	// Output data streams
-	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
+	Base::DataStreamOut<Types::HomogMatrix> out_homog_matrix;
 
 	// Handlers
 
 	// Properties
+	///  Property - path to save calculation results
+	Base::Property<std::string> prop_calc_path;
 
 	// Handlers
 	Base::EventHandler<CalcStatistics> h_calculate;
 
-	Types::HomogMatrix cumulatedHomogMatrix;
-	cv::Mat_<double> cumulatedRvec;
-	cv::Mat_<double> cumulatedTvec;
-	cv::Mat_<double> cumulatedAxis;
-	double cumulatedFi;
+	Types::HomogMatrix cumulated_homog_matrix;
+	cv::Mat_<double> cumulated_rvec;
+	cv::Mat_<double> cumulated_tvec;
+	cv::Mat_<double> cumulated_axis;
+	double cumulated_fi;
 
-	cv::Mat_<double> avgRvec;
-	cv::Mat_<double> avgTvec;
-	cv::Mat_<double> avgAxis;
-	double avgFi;
+	cv::Mat_<double> avg_rvec;
+	cv::Mat_<double> avg_tvec;
+	cv::Mat_<double> avg_axis;
+	double avg_fi;
 	int counter;
 
-	double sumDeviationFi;
-	double sumDeviationAxisX;
-	double sumDeviationAxisY;
-	double sumDeviationAxisZ;
+	double sum_deviation_fi;
+	double sum_deviation_axis_X;
+	double sum_deviation_axis_Y;
+	double sum_deviation_axis_Z;
 
 	void calculate();
 

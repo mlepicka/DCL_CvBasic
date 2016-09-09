@@ -73,10 +73,10 @@ protected:
 	bool onStop();
 
 	// Input data streams
-	Base::DataStreamIn<Types::HomogMatrix> in_homogMatrix;
+	Base::DataStreamIn<Types::HomogMatrix> in_homog_matrix;
 
 	// Output data streams
-	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
+	Base::DataStreamOut<Types::HomogMatrix> out_homog_matrix;
 
 	// Handlers
 

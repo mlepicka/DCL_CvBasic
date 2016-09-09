@@ -9,7 +9,9 @@
 
 #include "CvSIFT.hpp"
 #include "Common/Logger.hpp"
-
+#include "Common/Timer.hpp"
+#include <sstream>
+#include <fstream>
 #include <boost/bind.hpp>
 
 #if CV_MAJOR_VERSION == 2
@@ -24,7 +26,8 @@ namespace Processors {
 namespace CvSIFT {
 
 CvSIFT::CvSIFT(const std::string & name) :
-		Base::Component(name)  {
+		Base::Component(name), prop_calc_path("Calculations_path",std::string(".")) {
+	registerProperty(prop_calc_path);
 
 }
 
@@ -65,8 +68,12 @@ void CvSIFT::onNewImage()
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
+		std::ofstream feature_calc_time;
+		feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech.txt")).c_str(), ios::out|ios::app);
 
+		Common::Timer timer;
 
+		timer.restart();
 		//-- Step 1: Detect the keypoints.
 	    cv::SiftFeatureDetector detector;
 	    std::vector<cv::KeyPoint> keypoints;
@@ -76,6 +83,7 @@ void CvSIFT::onNewImage()
 		cv::SiftDescriptorExtractor extractor;
 		Mat descriptors;
 		extractor.compute( input, keypoints, descriptors);
+		feature_calc_time << timer.elapsed() << endl;
 
 		// Write results to outputs.
 	    Types::Features features(keypoints);
