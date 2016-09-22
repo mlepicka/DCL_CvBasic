@@ -257,10 +257,10 @@ namespace cv
         int sublevels;
         int diffusivity;
         
-         static Ptr<AKAZE> create(int descriptor_type = DESCRIPTOR_KAZE_UPRIGHT,
+         static Ptr<AKAZE> create(int diffusivity = KAZE::DIFF_WEICKERT, int descriptor_type = DESCRIPTOR_KAZE_UPRIGHT,
                              int descriptor_size = 0 , int descriptor_channels = 3,
                              float threshold = 0.001f, int octaves = 4,
-                             int sublevels = 4, int diffusivity = KAZE::DIFF_WEICKERT)
+                             int sublevels = 4)
 		{
 			return makePtr<AKAZE>(descriptor_type, descriptor_size, descriptor_channels,
                                    threshold, octaves, sublevels, diffusivity);

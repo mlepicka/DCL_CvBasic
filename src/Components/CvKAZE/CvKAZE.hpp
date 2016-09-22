@@ -85,6 +85,8 @@ protected:
 
 	///  Property - path to save calculation results
 	Base::Property<std::string> prop_calc_path;
+	///  Property - set functions for calculate diffusivity in non linear space
+	Base::Property<int> prop_diffusivity;
 
 };
 

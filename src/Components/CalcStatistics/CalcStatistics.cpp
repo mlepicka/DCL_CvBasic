@@ -84,7 +84,7 @@ bool CalcStatistics::onStart() {
 void CalcStatistics::calculate() {
 	 int i;
 	 std::ofstream output_all, error_fi, error_trans, error_dist;
-	 /* sad hardcoded paths :D*/
+
 	 output_all.open((string(prop_calc_path)+string("output.txt")).c_str(), ios::out|ios::app);
 	 error_fi.open((string(prop_calc_path)+string("blad_kata_fi.txt")).c_str(), ios::out|ios::app);
 	 error_trans.open((string(prop_calc_path)+string("blad_translacji.txt")).c_str(), ios::out|ios::app);

@@ -69,13 +69,13 @@ void CvSIFT::onNewImage()
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 		std::ofstream feature_calc_time;
-		feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech.txt")).c_str(), ios::out|ios::app);
+		feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech_sift.txt")).c_str(), ios::out|ios::app);
 
 		Common::Timer timer;
 
 		timer.restart();
 		//-- Step 1: Detect the keypoints.
-	    cv::SiftFeatureDetector detector;
+	    cv::SiftFeatureDetector detector(0,4);
 	    std::vector<cv::KeyPoint> keypoints;
 	    detector.detect(input, keypoints);
 
