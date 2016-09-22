@@ -65,7 +65,7 @@ void CvGaussianNoise::generate_noise(){
 	result = greyMat;
 	
 	
-	cv::randn(noise, 0, 100);
+	cv::randn(noise, 0, 10);
 
 	noise.convertTo(noise, greyMat.type());
 	
@@ -77,7 +77,10 @@ void CvGaussianNoise::generate_noise(){
 
 	if(!pass_through){
 		out_img.write(result);
+	}else{
+		out_img.write(colorMat);
 	}
+	
 	
 	
 }
