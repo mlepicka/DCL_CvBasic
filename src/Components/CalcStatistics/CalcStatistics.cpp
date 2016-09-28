@@ -30,7 +30,7 @@ namespace Processors {
 namespace CalcStatistics {
 
 CalcStatistics::CalcStatistics(const std::string & name) :
-		Base::Component(name), prop_calc_path("Calculations_path",std::string(".")) {
+		Base::Component(name), prop_calc_path("Calculations.path",std::string(".")) {
 	registerProperty(prop_calc_path);
 }
 
@@ -116,6 +116,7 @@ void CalcStatistics::calculate() {
 		stringstream ss;
 		CLOG(LINFO)<<"Reading matrixes";
 		homog_matrix=in_homog_matrix.read();
+
 		Types::HomogMatrix homog_matrix_right_tmp;
 		homog_matrix_right_tmp=in_homog_matrix_right.read();
 		homog_matrix_right=homog_matrix_right_tmp;
@@ -228,7 +229,6 @@ void CalcStatistics::calculate() {
 		ss << homog_matrix(i,3) << " \n ";
 	}
 	if(identity){
-
 		CLOG(LINFO)<<"identity matrix";
 		output_all<<"identity matrix" << endl;
 		return;

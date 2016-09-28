@@ -72,7 +72,7 @@ protected:
 	/*!
 	 * Event handler function.
 	 */
-	void onNewImage();
+	void calculate_features();
 
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;

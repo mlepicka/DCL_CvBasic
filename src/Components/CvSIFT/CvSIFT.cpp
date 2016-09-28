@@ -26,7 +26,8 @@ namespace Processors {
 namespace CvSIFT {
 
 CvSIFT::CvSIFT(const std::string & name) :
-		Base::Component(name), prop_calc_path("Calculations_path",std::string(".")) {
+		Base::Component(name), prop_calc_path("Calculations.path",
+				std::string(".")) {
 	registerProperty(prop_calc_path);
 
 }
@@ -62,39 +63,41 @@ bool CvSIFT::onStart() {
 	return true;
 }
 
-void CvSIFT::onNewImage()
-{
-	LOG(LTRACE) << "CvSIFT::onNewImage\n";
+void CvSIFT::onNewImage() {
+	LOG(LTRACE)<< "CvSIFT::onNewImage\n";
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 		std::ofstream feature_calc_time;
-		feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech_sift.txt")).c_str(), ios::out|ios::app);
 
+		if(!string(prop_calc_path).empty()) {
+			feature_calc_time.open((string(prop_calc_path)+string("czas_wyznaczenia_cech_sift.txt")).c_str(), ios::out|ios::app);
+		}
 		Common::Timer timer;
 
 		timer.restart();
 		//-- Step 1: Detect the keypoints.
-	    cv::SiftFeatureDetector detector(0,4);
-	    std::vector<cv::KeyPoint> keypoints;
-	    detector.detect(input, keypoints);
+		cv::SiftFeatureDetector detector(0,4);
+		std::vector<cv::KeyPoint> keypoints;
+		detector.detect(input, keypoints);
 
 		//-- Step 2: Calculate descriptors (feature vectors).
 		cv::SiftDescriptorExtractor extractor;
 		Mat descriptors;
 		extractor.compute( input, keypoints, descriptors);
-		feature_calc_time << timer.elapsed() << endl;
 
+		if(!string(prop_calc_path).empty()) {
+			feature_calc_time << timer.elapsed() << endl;
+		}
 		// Write results to outputs.
-	    Types::Features features(keypoints);
-	    features.type = "SIFT";
+		Types::Features features(keypoints);
+		features.type = "SIFT";
 		out_features.write(features);
 		out_descriptors.write(descriptors);
 	} catch (...) {
 		LOG(LERROR) << "CvSIFT::onNewImage failed\n";
 	}
 }
-
 
 } //: namespace CvSIFT
 } //: namespace Processors

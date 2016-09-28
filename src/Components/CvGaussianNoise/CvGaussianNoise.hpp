@@ -79,6 +79,10 @@ protected:
 
 	Base::Property<bool> pass_through;
 	
+	Base::Property<float> mean;
+
+	Base::Property<float> sigma;
+
 	// Handlers
 
 	void generate_noise();

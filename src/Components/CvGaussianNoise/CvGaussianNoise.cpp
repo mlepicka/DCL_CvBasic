@@ -17,9 +17,10 @@ namespace Processors {
 namespace CvGaussianNoise {
 
 CvGaussianNoise::CvGaussianNoise(const std::string & name) :
-		Base::Component(name), pass_through("pass_through",0)  {
+		Base::Component(name), pass_through("pass_through",0), mean("GaussianNoise.mean",0) , sigma("GaussianNoise.sigma",0)   {
 			registerProperty(pass_through);
-
+			registerProperty(mean);
+			registerProperty(sigma);
 }
 
 CvGaussianNoise::~CvGaussianNoise() {
@@ -73,7 +74,6 @@ void CvGaussianNoise::generate_noise(){
 	
 	//cv::imshow("OUTPUT",result);
 	//cvWaitKey(0);
-
 
 	if(!pass_through){
 		out_img.write(result);
